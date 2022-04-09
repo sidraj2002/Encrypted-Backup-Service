@@ -4,5 +4,71 @@ import sys
 import os
 import subprocess
 import cryptography
+import datetime
 from botocore.exceptions import ClientError
+from cryptography.fernet import Fernet
 
+class SymmetricKey:
+    def __init__(self):
+        self.KeyName = None
+        self.KeyValue = None
+        self.KeyType = None
+        self.KeyTimeStamp = None
+        
+'''Generate new Key at the OS level and Return Key object'''        
+def GenerateKey(KeyName):
+    NewKey = SymmetricKey()
+    Key = Fernet.generate_key()
+    #print(Key)
+    NewKey.KeyName = KeyName
+    NewKey.KeyValue = Key
+    NewKey.KeyType = 'Fernet'
+    NewKey.KeyTimeStamp = datetime.datetime.now()
+    return NewKey
+ 
+'''Upload generated Key.Value to AWS Secrets Manager'''    
+def SecretsManagerAWS(KeyObject):
+    try:
+        client = boto3.client('secretsmanager')
+        response = client.get_secret_value(
+        SecretId=KeyObject.KeyName
+        )
+    except ClientError as error:
+        #print(error.response)
+        response = client.create_secret(
+        Name=KeyObject.KeyName,
+        Description='Sids Utility Generated Secret',
+        SecretString=str(KeyObject.KeyValue),
+        Tags=[
+           {
+                'Key': 'CreationTimeStamp',
+                'Value': str(KeyObject.KeyTimeStamp)
+             },
+          ],
+          ForceOverwriteReplicaSecret=True
+        )
+    #print(response)
+    if response['ResponseMetadata']['HTTPStatusCode'] == 200:
+        #print(response)
+        return response
+    else:
+        
+        return (response)
+'''If KeyName environment variable exists, pull key value from secrets manager; If it doesnt exist, create new key, push to secrets manager'''    
+try: 
+    if os.getenv('KeyName') is None:
+        key = GenerateKey('MyNewKey')
+        #print(key.KeyValue)
+        response = SecretsManagerAWS(key)
+        print(response)
+    else:
+        print('Key already Exists: ', os.getenv('KeyName'))
+        key = SymmetricKey()
+        key.KeyName = os.getenv('KeyName')
+        response = SecretsManagerAWS(key)
+        print(response)
+    
+
+except ClientError as error:
+        print(error.response)        
+# KMSKeyID - Add to Config File 

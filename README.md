@@ -9,3 +9,4 @@ Future Scope:
  - Prefex encrypted objects pushed to S3
  - Dynamo Table: Encryption key -> S3 object relationaship
  - Key rotation
+ - Config File to pull KMS ID for secrets encryption, and other variables
