@@ -14,6 +14,8 @@ def s3CreateBuckets(region, BucketName):
     
     return CreateBucket
     
+''' Create S3 Buckt if the environment variable doesnt exist. Then Set env variable with Bucket name and URL '''   
+ 
 try:
     if sys.argv != None and os.getenv('S3BUCKETURL') is None:
         print(os.getenv('S3BUCKETURL'))
@@ -21,7 +23,7 @@ try:
         #print(newbucket['ResponseMetadata'])
         if newbucket['ResponseMetadata']['HTTPStatusCode'] == 200:
             print('Created Bucket '+ sys.argv[2]  + ' in region:', sys.argv[1])
-            subprocess.Popen(export S3BUCKETNAME=sys.argv[2])
+            # subprocess.Popen(export S3BUCKETNAME=sys.argv[2])
             os.putenv('S3BUCKETURL', str(newbucket['ResponseMetadata']['HTTPHeaders']['location']))
             os.environ['S3BUCKETNAME'] = sys.argv[2]
     else:
@@ -29,3 +31,4 @@ try:
 except ClientError as error:
         print(error.response)
     #print (newbuckets)
+    
