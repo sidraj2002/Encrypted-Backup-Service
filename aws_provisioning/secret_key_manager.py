@@ -1,5 +1,6 @@
 ''' Generate key and push to AWS secrets manager and export environment variables'''
 import boto3
+import base64
 import sys
 import os
 import subprocess
@@ -35,10 +36,11 @@ def SecretsManagerAWS(KeyObject):
         )
     except ClientError as error:
         #print(error.response)
+        KeyVal = KeyObject.KeyValue
         response = client.create_secret(
         Name=KeyObject.KeyName,
         Description='Sids Utility Generated Secret',
-        SecretString=str(KeyObject.KeyValue),
+        SecretBinary=KeyVal,
         Tags=[
            {
                 'Key': 'CreationTimeStamp',
@@ -60,7 +62,7 @@ def SecretsManagerAWS(KeyObject):
 
 try: 
     if os.getenv('KeyName') is None:
-        key = GenerateKey('MyNewKey')
+        key = GenerateKey('MyNewKey1')
         #print(key.KeyValue)
         response = SecretsManagerAWS(key)
         print(response)
