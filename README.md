@@ -10,7 +10,7 @@ Future Scope:
  - Dynamo Table: Encryption key -> S3 object relationaship
  - Key rotation
  - Config File to pull KMS ID for secrets encryption, and other variables
- - 
+ - Add Inode checking using stat ./TestDir (compare Modified time stamp, if changed check for new files)
  Limitations:
  - Export KeyName and S3BUCKETNAME to OS environment variable (need to use subprocess perhaps) (for persistence)
  - Variables currently exported only within scope of the process, process exit = variable disappears
