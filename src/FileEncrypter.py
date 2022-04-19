@@ -69,7 +69,17 @@ def EncryptFiles(SecretString, FilePath):
         output_file = FilePath + '.encrypted'
     with open(output_file, 'wb') as f:
         f.write(encrypted)
+        
+def DecryptFiles(SecretBinary, FilePath):
+    
+    decrypt = Fernet(SecretBinary)
+    with open(FilePath, 'rb') as f:
+        data = f.read()
+        decrypted = decrypt.decrypt(data)
 
+        output_file = FilePath + '.decrypted'
+    with open(output_file, 'wb') as f:
+        f.write(decrypted)
 '''If KeyName environment variable exists, pull key value from secrets manager; If it doesnt exist, create new key, push to secrets manager'''
 '''Only KeyName is stored at the OS level; So auth needs to be done through AWS to retrieve actual key from secrets manager'''
 '''Exporting Key Name to OS still needs to be done - Subprocess or something like that'''
@@ -96,4 +106,5 @@ print(key)
 #newkey = base64.b64decode(key)
 #print(newkey)
 
-EncryptFiles(key, '/home/ec2-user/environment/EncryptedBackupService/Encrypted-Backup-Service/TestDir/Untitled')
+EncryptFiles(key, '/home/ec2-user/environment/EncryptDaemon/Encrypted-Backup-Service/TestDir/Untitled')
+DecryptFiles(key, '/home/ec2-user/environment/EncryptDaemon/Encrypted-Backup-Service/TestDir/Untitled.encrypted')
